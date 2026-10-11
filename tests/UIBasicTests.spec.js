@@ -1,29 +1,26 @@
-const {test, expect} = require ('@playwright/test');
-const { sign } = require('node:crypto');
+const { test, expect } = require('@playwright/test');
 
 
-test('Browser Context Playwright Test', async ({browser})=>
-{
+test('Browser Context Playwright Test', async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
 });
 
-test('Page Playwright Test', async ({page})=>
-{
+test('Page Playwright Test', async ({ page }) => {
     await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
-    console.log (await page.title());
+    console.log(await page.title());
     await expect(page).toHaveTitle('LoginPage Practise | Rahul Shetty Academy');
 });
 
-test.only('Web browser login validation', async({page})=>{
+test('Web browser login validation', async ({ page }) => {
     const username = page.locator('#username');
     const password = page.locator('#password');
     const signIn = page.locator("[id='signInBtn']");
     const cardTiles = page.locator('.card-body a');
 
     await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
-    console.log (await page.title());
+    console.log(await page.title());
     await expect(page).toHaveTitle('LoginPage Practise | Rahul Shetty Academy');
 
     //invalid login - validate error message
@@ -50,4 +47,15 @@ test.only('Web browser login validation', async({page})=>{
     console.log(await cardTiles.allTextContents());
 
 });
+
+test.only("Test Practice Website Login", async ({ page }) => {
+    const username = page.locator('#userEmail');
+    const password = page.locator('#userPassword');
+    const loginbtn = page.locator('#login');
+    await page.goto("https://rahulshettyacademy.com/client/#/auth/login");
+    await username.fill('nandini.nig@email.com');
+    await password.fill('RahulShetty@1234');
+    await loginbtn.click();
+    console.log(await page.locator("[style *= 'text-transform']").nth(0).textContent());
+})
 
