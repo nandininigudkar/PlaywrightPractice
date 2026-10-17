@@ -48,14 +48,74 @@ test('Web browser login validation', async ({ page }) => {
 
 });
 
-test.only("Test Practice Website Login", async ({ page }) => {
+test("Test Practice Website Login", async ({ page }) => {
     const username = page.locator('#userEmail');
     const password = page.locator('#userPassword');
     const loginbtn = page.locator('#login');
     await page.goto("https://rahulshettyacademy.com/client/#/auth/login");
     await username.fill('nandini.nig@email.com');
     await password.fill('RahulShetty@1234');
+
+    console.log(await username.textContent()); //textContent() method will return the elements linked to the HTML DOM. Hence this method will return blanks
+    console.log(await username.inputValue()); //inputValue() method will return the input value by user
+
     await loginbtn.click();
     console.log(await page.locator("[style *= 'text-transform']").nth(0).textContent());
 })
 
+test.only ('UI Controls', async ({ page }) => {
+    const username = page.locator('#username');
+    const password = page.locator('#password');
+    const dropdown = page.locator("select.form-control");
+    const radiobtn = page.locator("span.checkmark");
+    const popup = page.locator("button#okayBtn");
+    const blinkingtext = page.locator("[href *= 'documents-request']");
+
+    await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
+    console.log(await page.title());
+    await expect(page).toHaveTitle('LoginPage Practise | Rahul Shetty Academy');
+
+    //invalid login - validate error message
+    await username.fill('rahulshettyacademy');
+    await password.fill('Learning@830$3mK2');
+    //select dropdown
+    await dropdown.selectOption("Teacher");
+    //select radio button
+    await radiobtn.nth(1).click();
+    //click OKAY on popup
+    await popup.click();
+    //assertion to check if the checkbox is checked
+    await expect((radiobtn).last()).toBeChecked();
+    // debugging - opens playwright inspector window
+    await page.pause();
+    //assertion - check blinking text
+    expect(blinkingtext).toHaveAttribute("class", "blinkingText");
+
+});
+
+test ('Handle Child Window', async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const blinkingtext = page.locator("[href *= 'documents-request']");
+
+    await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
+    console.log(await page.title());
+    await expect(page).toHaveTitle('LoginPage Practise | Rahul Shetty Academy');
+
+    await expect(blinkingtext).toHaveAttribute('class', 'blinkingText');
+
+    const [newPage] = await Promise.all([
+        context.waitForEvent('page'),
+        blinkingtext.click(),
+    ]);
+
+    const text = await newPage.locator('.red').textContent();
+    console.log(text);
+    
+    //extract the domain name 'rahulshettyacademy.com' from text
+    const arrayText = text.split('@');
+    const domain = arrayText[1].split(' ')[0];
+    console.log(domain);
+
+    
+});
